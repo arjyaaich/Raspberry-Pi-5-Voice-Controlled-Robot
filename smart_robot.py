@@ -38,7 +38,7 @@ for filename in os.listdir(KNOWN_FACES_DIR):
         known_face_encodings.append(encoding)
         known_face_names.append(os.path.splitext(filename)[0])
 
-# Initialize OpenAI
+
 openai.api_key = OPENAI_API_KEY
 
 class NavigationSystem:
@@ -48,10 +48,10 @@ class NavigationSystem:
         self.last_detected_faces = []
     
     def analyze_scene(self, frame):
-        # Convert frame to RGB for face recognition
+
         rgb_frame = frame[:, :, ::-1]
         
-        # Find faces
+     
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
         
@@ -68,7 +68,7 @@ class NavigationSystem:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
             cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         
-        # Simple obstacle detection (can be enhanced with ultrasonic sensors)
+
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray, 100, 200)
         self.obstacles = np.sum(edges > 0) / edges.size > 0.1  # Threshold for obstacle detection
@@ -86,17 +86,15 @@ class NavigationSystem:
         else:
             scene_description += "No faces detected. "
         
-        prompt = f"""
-        You are a navigation system for a home robot. Based on the following scene description, 
-        decide the next movement action. Only respond with one of these exact commands:
-        - FORWARD
-        - BACKWARD
-        - LEFT
-        - RIGHT
-        - STOP
         
-        Scene: {scene_description}
-        """
+ '''commands -
+         FORWARD
+         BACKWARD
+         LEFT
+         RIGHT
+         STOP
+        
+      '''  
         
         try:
             response = openai.ChatCompletion.create(
@@ -151,7 +149,7 @@ def main():
     nav_system = NavigationSystem()
     voice_system = VoiceSystem()
     
-    # Start navigation thread
+   
     def navigation_worker():
         while True:
             frame = picam2.capture_array()
@@ -179,8 +177,7 @@ def main():
     
     nav_thread = threading.Thread(target=navigation_worker, daemon=True)
     nav_thread.start()
-    
-    # Main voice interaction loop
+
     while True:
         voice_system.speak("I'm ready for your command.")
         command = voice_system.listen()
